@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,9 +32,17 @@ class CrimeListFragment: Fragment() {
     }
 
     private inner class CrimeViewHolder(view: View): RecyclerView.ViewHolder(view){
-        val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
-        val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
+        private val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
+        private val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
 
+        fun bind(crime: Crime){
+            titleTextView.text = crime.title
+            dateTextView.text = crime.date.toString()
+            itemView.setOnClickListener {
+                Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
     }
 
     private inner class CrimeAdapter(var crimes: List<Crime>)
@@ -42,13 +51,8 @@ class CrimeListFragment: Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
         = CrimeViewHolder(layoutInflater.inflate(R.layout.list_item_crime, parent, false))
 
-        override fun onBindViewHolder(holder: CrimeViewHolder, position: Int) {
-            val crime = crimes[position]
-            holder.apply {
-                titleTextView.text = crime.title
-                dateTextView.text = crime.date.toString()
-            }
-        }
+        override fun onBindViewHolder(holder: CrimeViewHolder, position: Int)
+        = holder.bind(crimes[position])
 
         override fun getItemCount() = crimes.size
     }
