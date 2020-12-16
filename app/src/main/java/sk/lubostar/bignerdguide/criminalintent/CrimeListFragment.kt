@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_crime_list.*
+import java.text.DateFormat
 
 class CrimeListFragment: Fragment() {
     companion object {
@@ -33,13 +34,14 @@ class CrimeListFragment: Fragment() {
     }
 
     private inner class CrimeViewHolder(view: View): RecyclerView.ViewHolder(view){
+        private val dateFormat = DateFormat.getDateInstance(DateFormat.FULL)
         private val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
         private val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
         private val crimeSolved: ImageView = itemView.findViewById(R.id.crime_solved)
 
         fun bind(crime: Crime){
             titleTextView.text = crime.title
-            dateTextView.text = crime.date.toString()
+            dateTextView.text = dateFormat.format(crime.date)
             crimeSolved.visibility = if (crime.isSolved) View.VISIBLE else View.GONE
             itemView.setOnClickListener {
                 Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
