@@ -25,6 +25,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "db/schema/")
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
