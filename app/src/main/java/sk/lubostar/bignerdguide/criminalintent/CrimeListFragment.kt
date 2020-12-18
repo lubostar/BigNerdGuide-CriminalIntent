@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_crime_list.*
@@ -30,7 +31,11 @@ class CrimeListFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         crime_recycler_view.layoutManager = LinearLayoutManager(context)
-        crime_recycler_view.adapter = CrimeAdapter(viewModel.crimes)
+        crime_recycler_view.adapter = CrimeAdapter(emptyList())
+
+        viewModel.crimeListLiveData.observe(viewLifecycleOwner, { crimes ->
+            crime_recycler_view.adapter = CrimeAdapter(crimes)
+        })
     }
 
     private inner class CrimeViewHolder(view: View): RecyclerView.ViewHolder(view){
