@@ -1,6 +1,7 @@
 package sk.lubostar.bignerdguide.criminalintent
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.room.Room
 import sk.lubostar.bignerdguide.criminalintent.database.CrimeDatabase
 import java.lang.IllegalStateException
@@ -25,6 +26,6 @@ class CrimeRepository private constructor(context: Context){
 
     private val crimeDao = db.crimeDao()
 
-    fun getCrimes() = crimeDao.getCrimes()
-    fun getCrime(id: UUID) = crimeDao.getCrime(id)
+    fun getCrimes(): LiveData<List<Crime>> = crimeDao.getCrimes()
+    fun getCrime(id: UUID): LiveData<Crime?> = crimeDao.getCrime(id)
 }

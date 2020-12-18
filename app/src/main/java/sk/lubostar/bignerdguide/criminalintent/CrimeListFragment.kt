@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_crime_list.*
@@ -25,8 +24,8 @@ class CrimeListFragment: Fragment() {
     private val viewModel: CrimeListViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View?
-    = inflater.inflate(R.layout.fragment_crime_list, container, false)
+                              savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_crime_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,11 +57,11 @@ class CrimeListFragment: Fragment() {
     private inner class CrimeAdapter(var crimes: List<Crime>)
         : RecyclerView.Adapter<CrimeViewHolder>(){
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
-        = CrimeViewHolder(layoutInflater.inflate(R.layout.list_item_crime, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            CrimeViewHolder(layoutInflater.inflate(R.layout.list_item_crime, parent, false))
 
-        override fun onBindViewHolder(holder: CrimeViewHolder, position: Int)
-        = holder.bind(crimes[position])
+        override fun onBindViewHolder(holder: CrimeViewHolder, position: Int) =
+            holder.bind(crimes[position])
 
         override fun getItemCount() = crimes.size
     }
