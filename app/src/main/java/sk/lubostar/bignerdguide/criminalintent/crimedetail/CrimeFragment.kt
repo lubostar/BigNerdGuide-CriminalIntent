@@ -10,11 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.fragment_crime.*
 import sk.lubostar.bignerdguide.criminalintent.Crime
+import sk.lubostar.bignerdguide.criminalintent.DatePickerFragment
 import sk.lubostar.bignerdguide.criminalintent.R
+import java.text.DateFormat
 import java.util.*
 
-class CrimeFragment: Fragment() {
+class CrimeFragment: Fragment(), DatePickerFragment.Callbacks {
     companion object{
+        private const val DIALOG_DATE_TAG = "dialog_date_tag"
+        private const val REQUEST_DATE = 0
+
         private const val ARG_CRIME_ID = "arg_crime_id"
 
         fun newInstance(uuid: UUID) = CrimeFragment().apply {
@@ -22,6 +27,8 @@ class CrimeFragment: Fragment() {
                     putSerializable(ARG_CRIME_ID, uuid)
                 }}
     }
+
+    private val dateFormat = DateFormat.getDateInstance(DateFormat.FULL)
 
     private lateinit var crime: Crime
     private val crimeDetailViewModel: CrimeDetailViewModel by viewModels()
@@ -77,8 +84,18 @@ class CrimeFragment: Fragment() {
             jumpDrawablesToCurrentState()
         }
         crime_date.apply {
-            text = crime.date.toString()
-            isEnabled = false
+            text = dateFormat.format(crime.date)
+            setOnClickListener {
+                DatePickerFragment.newInstance(crime.date).apply {
+                    setTargetFragment(this@CrimeFragment, REQUEST_DATE)
+                    show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE_TAG)
+                }
+            }
         }
+    }
+
+    override fun onDateSelected(date: Date) {
+        crime.date = date
+        updateUi()
     }
 }
