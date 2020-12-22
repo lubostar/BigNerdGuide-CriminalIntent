@@ -1,4 +1,4 @@
-package sk.lubostar.bignerdguide.criminalintent
+package sk.lubostar.bignerdguide.criminalintent.crimelist
 
 import android.content.Context
 import android.os.Bundle
@@ -7,12 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_crime_list.*
+import sk.lubostar.bignerdguide.criminalintent.Crime
+import sk.lubostar.bignerdguide.criminalintent.R
 import java.text.DateFormat
 import java.util.*
 

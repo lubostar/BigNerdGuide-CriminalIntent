@@ -1,4 +1,4 @@
-package sk.lubostar.bignerdguide.criminalintent
+package sk.lubostar.bignerdguide.criminalintent.crimedetail
 
 import android.os.Bundle
 import android.text.Editable
@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.fragment_crime.*
+import sk.lubostar.bignerdguide.criminalintent.Crime
+import sk.lubostar.bignerdguide.criminalintent.R
 import java.util.*
 
 class CrimeFragment: Fragment() {

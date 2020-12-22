@@ -1,9 +1,11 @@
-package sk.lubostar.bignerdguide.criminalintent
+package sk.lubostar.bignerdguide.criminalintent.crimedetail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import sk.lubostar.bignerdguide.criminalintent.Crime
+import sk.lubostar.bignerdguide.criminalintent.CrimeRepository
 import java.util.*
 
 class CrimeDetailViewModel: ViewModel() {

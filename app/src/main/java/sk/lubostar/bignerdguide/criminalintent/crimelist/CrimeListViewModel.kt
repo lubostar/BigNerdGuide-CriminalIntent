@@ -1,7 +1,9 @@
-package sk.lubostar.bignerdguide.criminalintent
+package sk.lubostar.bignerdguide.criminalintent.crimelist
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import sk.lubostar.bignerdguide.criminalintent.Crime
+import sk.lubostar.bignerdguide.criminalintent.CrimeRepository
 
 class CrimeListViewModel : ViewModel() {
     private val crimeRepository = CrimeRepository.getInstance()

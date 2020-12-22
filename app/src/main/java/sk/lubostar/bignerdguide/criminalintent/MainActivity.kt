@@ -2,6 +2,8 @@ package sk.lubostar.bignerdguide.criminalintent
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import sk.lubostar.bignerdguide.criminalintent.crimedetail.CrimeFragment
+import sk.lubostar.bignerdguide.criminalintent.crimelist.CrimeListFragment
 import java.util.*
 
 class MainActivity : AppCompatActivity(), CrimeListFragment.Callbacks {
