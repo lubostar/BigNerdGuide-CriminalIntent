@@ -44,18 +44,6 @@ class CrimeFragment: Fragment() {
         })
     }
 
-    private fun updateUi(){
-        crime_title.setText(crime.title)
-        crime_solved.apply {
-            isChecked = crime.isSolved
-            jumpDrawablesToCurrentState()
-        }
-        crime_date.apply {
-            text = crime.date.toString()
-            isEnabled = false
-        }
-    }
-
     override fun onStart() {
         super.onStart()
 
@@ -73,5 +61,22 @@ class CrimeFragment: Fragment() {
 
         crime_title.addTextChangedListener(titleWatcher)
         crime_solved.setOnCheckedChangeListener{ _, isChecked -> crime.isSolved = isChecked }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        crimeDetailViewModel.saveCrime(crime)
+    }
+
+    private fun updateUi(){
+        crime_title.setText(crime.title)
+        crime_solved.apply {
+            isChecked = crime.isSolved
+            jumpDrawablesToCurrentState()
+        }
+        crime_date.apply {
+            text = crime.date.toString()
+            isEnabled = false
+        }
     }
 }
