@@ -1,5 +1,6 @@
 package sk.lubostar.bignerdguide.criminalintent
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_crime_list.*
 import java.text.DateFormat
+import java.util.*
 
 class CrimeListFragment: Fragment() {
     companion object {
@@ -21,7 +23,21 @@ class CrimeListFragment: Fragment() {
         }
     }
 
+    /**
+     * Required interface for hosting activities
+     */
+    interface Callbacks {
+        fun onCrimeSelected(crimeId: UUID)
+    }
+
+    private var callbacks: Callbacks? = null
+
     private val viewModel: CrimeListViewModel by viewModels()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks = context as Callbacks?
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? =
@@ -37,6 +53,11 @@ class CrimeListFragment: Fragment() {
         })
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
+    }
+
     private inner class CrimeViewHolder(view: View): RecyclerView.ViewHolder(view){
         private val dateFormat = DateFormat.getDateInstance(DateFormat.FULL)
         private val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
@@ -48,8 +69,7 @@ class CrimeListFragment: Fragment() {
             dateTextView.text = dateFormat.format(crime.date)
             crimeSolved.visibility = if (crime.isSolved) View.VISIBLE else View.GONE
             itemView.setOnClickListener {
-                Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
-                    .show()
+                callbacks?.onCrimeSelected(crime.id)
             }
         }
     }

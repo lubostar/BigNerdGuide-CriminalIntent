@@ -7,15 +7,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.fragment_crime.*
+import java.util.*
 
 class CrimeFragment: Fragment() {
+    companion object{
+        private const val ARG_CRIME_ID = "arg_crime_id"
+
+        fun newInstance(uuid: UUID) = CrimeFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(ARG_CRIME_ID, uuid)
+                }}
+    }
 
     private lateinit var crime: Crime
+    private val crimeDetailViewModel: CrimeDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         crime = Crime()
+        val crimeId: UUID = arguments?.getSerializable(ARG_CRIME_ID) as UUID
+        crimeDetailViewModel.loadCrime(crimeId)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -24,6 +37,19 @@ class CrimeFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        crimeDetailViewModel.crimeLiveData.observe(viewLifecycleOwner, { crime ->
+            crime?.let {
+                this.crime = crime
+                updateUi() }
+        })
+    }
+
+    private fun updateUi(){
+        crime_title.setText(crime.title)
+        crime_solved.apply {
+            isChecked = crime.isSolved
+            jumpDrawablesToCurrentState()
+        }
         crime_date.apply {
             text = crime.date.toString()
             isEnabled = false
