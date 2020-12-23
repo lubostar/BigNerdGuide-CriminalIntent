@@ -12,13 +12,16 @@ import kotlinx.android.synthetic.main.fragment_crime.*
 import sk.lubostar.bignerdguide.criminalintent.Crime
 import sk.lubostar.bignerdguide.criminalintent.DatePickerFragment
 import sk.lubostar.bignerdguide.criminalintent.R
+import sk.lubostar.bignerdguide.criminalintent.TimePickerFragment
 import java.text.DateFormat
 import java.util.*
 
-class CrimeFragment: Fragment(), DatePickerFragment.Callbacks {
+class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragment.Callbacks {
     companion object{
         private const val DIALOG_DATE_TAG = "dialog_date_tag"
+        private const val DIALOG_TIME_TAG = "dialog_time_tag"
         private const val REQUEST_DATE = 0
+        private const val REQUEST_TIME = 1
 
         private const val ARG_CRIME_ID = "arg_crime_id"
 
@@ -92,10 +95,25 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks {
                 }
             }
         }
+        crime_time.apply {
+            text = if(crime.hour == null) "N/A" else "${crime.hour} : ${crime.minute}"
+            setOnClickListener {
+                TimePickerFragment.newInstance(crime.hour, crime.minute).apply {
+                    setTargetFragment(this@CrimeFragment, REQUEST_TIME)
+                    show(this@CrimeFragment.parentFragmentManager, DIALOG_TIME_TAG)
+                }
+            }
+        }
     }
 
     override fun onDateSelected(date: Date) {
         crime.date = date
+        updateUi()
+    }
+
+    override fun onTimeSelected(hour: Int, minute: Int) {
+        crime.hour = hour
+        crime.minute = minute
         updateUi()
     }
 }
