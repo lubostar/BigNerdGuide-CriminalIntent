@@ -2,9 +2,7 @@ package sk.lubostar.bignerdguide.criminalintent.crimelist
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -40,6 +38,11 @@ class CrimeListFragment: Fragment() {
         callbacks = context as Callbacks?
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_crime_list, container, false)
@@ -52,6 +55,21 @@ class CrimeListFragment: Fragment() {
         viewModel.crimeListLiveData.observe(viewLifecycleOwner, { crimes ->
             crime_recycler_view.adapter = CrimeAdapter(crimes)
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.new_crime -> with(Crime()){
+                    viewModel.addCrime(this)
+                    callbacks?.onCrimeSelected(id)
+                    true }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onDetach() {
