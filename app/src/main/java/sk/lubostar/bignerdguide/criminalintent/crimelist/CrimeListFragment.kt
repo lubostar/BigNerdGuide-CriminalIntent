@@ -17,6 +17,9 @@ import java.util.*
 
 class CrimeListFragment: Fragment() {
     companion object {
+        private const val FLIPPER_VIEW_LIST = 0
+        private const val FLIPPER_VIEW_EMPTY = 1
+
         fun newInstance(): CrimeListFragment {
             return CrimeListFragment()
         }
@@ -54,7 +57,11 @@ class CrimeListFragment: Fragment() {
 
         viewModel.crimeListLiveData.observe(viewLifecycleOwner, { crimes ->
             crime_recycler_view.adapter = CrimeAdapter(crimes)
+            crime_view_flipper.displayedChild = if(crimes.isEmpty()) { FLIPPER_VIEW_EMPTY }
+                                                else { FLIPPER_VIEW_LIST }
         })
+
+        crime_recycler_empty.setOnClickListener { addCrime() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -64,10 +71,10 @@ class CrimeListFragment: Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
-            R.id.new_crime -> with(Crime()){
-                    viewModel.addCrime(this)
-                    callbacks?.onCrimeSelected(id)
-                    true }
+            R.id.new_crime -> {
+                addCrime()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -75,6 +82,11 @@ class CrimeListFragment: Fragment() {
     override fun onDetach() {
         super.onDetach()
         callbacks = null
+    }
+
+    private fun addCrime() = with(Crime()){
+        viewModel.addCrime(this)
+        callbacks?.onCrimeSelected(id)
     }
 
     private inner class CrimeViewHolder(view: View): RecyclerView.ViewHolder(view){
