@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import sk.lubostar.bignerdguide.criminalintent.database.CrimeDatabase
+import sk.lubostar.bignerdguide.criminalintent.database.migration_1_2
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.Executors
@@ -23,7 +24,9 @@ class CrimeRepository private constructor(context: Context){
     }
 
     private val db = Room.databaseBuilder(context.applicationContext,
-        CrimeDatabase::class.java, DB_NAME).build()
+        CrimeDatabase::class.java, DB_NAME)
+        .addMigrations(migration_1_2)
+        .build()
 
     private val crimeDao = db.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
