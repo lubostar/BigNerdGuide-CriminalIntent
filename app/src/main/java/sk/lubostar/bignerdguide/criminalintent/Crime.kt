@@ -10,6 +10,7 @@ import java.util.*
                          var hour: Int? = null,
                          var minute: Int? = null,
                          var isSolved: Boolean = false,
-                         var suspect: String = ""
-) {
+                         var suspect: String = "") {
+
+    val photoFileName get() = "IMG_$id.jpg"
 }

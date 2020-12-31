@@ -7,12 +7,14 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.fragment_crime.*
@@ -21,6 +23,8 @@ import sk.lubostar.bignerdguide.criminalintent.DatePickerFragment
 import sk.lubostar.bignerdguide.criminalintent.R
 import sk.lubostar.bignerdguide.criminalintent.TimePickerFragment
 import sk.lubostar.bignerdguide.criminalintent.utils.TextDateFormat
+import sk.lubostar.bignerdguide.criminalintent.utils.getScaledBitmap
+import java.io.File
 import java.util.*
 
 class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragment.Callbacks {
@@ -33,6 +37,7 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
         private const val REQUEST_DATE = 0
         private const val REQUEST_TIME = 1
         private const val REQUEST_CONTACT = 2
+        private const val REQUEST_PHOTO = 3
 
         private const val ARG_CRIME_ID = "arg_crime_id"
 
@@ -44,8 +49,11 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
 
     private val dateFormat = TextDateFormat.getDateInstance(TextDateFormat.FULL)
 
-    private lateinit var crime: Crime
     private val crimeDetailViewModel: CrimeDetailViewModel by viewModels()
+
+    private lateinit var crime: Crime
+    private lateinit var photoFile: File
+    private lateinit var photoUri: Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,9 +68,14 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val packageManager: PackageManager = requireActivity().packageManager
+
         crimeDetailViewModel.crimeLiveData.observe(viewLifecycleOwner, { crime ->
             crime?.let {
                 this.crime = crime
+                photoFile = crimeDetailViewModel.getPhotoFile(crime)
+                photoUri = FileProvider.getUriForFile(requireActivity(),
+                    "sk.lubostar.bignerdguide.criminalintent.fileprovider", photoFile)
                 updateUi() }
         })
 
@@ -79,13 +92,32 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
 
         crime_suspect.apply {
             val pickContactIntent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-            val packageManager: PackageManager = requireActivity().packageManager
-            val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(pickContactIntent,
-                PackageManager.MATCH_DEFAULT_ONLY)
-            if(resolvedActivity == null){
+            if(!existDefaultAppForIntent(packageManager, pickContactIntent)){
                 isEnabled = false
             }else{
                 setOnClickListener { startActivityForResult(pickContactIntent, REQUEST_CONTACT) }
+            }
+        }
+
+        crime_camera.apply {
+            val captureImage = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if(!existDefaultAppForIntent(packageManager, captureImage)){
+                isEnabled = false
+            }else{
+                setOnClickListener {
+                    captureImage.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+
+                    val cameraActivities: List<ResolveInfo> = packageManager
+                        .queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
+
+                    for(cameraActivity in cameraActivities){
+                        requireActivity().grantUriPermission(
+                            cameraActivity.activityInfo.packageName, photoUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    }
+
+                    startActivityForResult(captureImage, REQUEST_PHOTO)
+                }
             }
         }
     }
@@ -114,9 +146,19 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
         crimeDetailViewModel.saveCrime(crime)
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().revokeUriPermission(photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when {
             resultCode != Activity.RESULT_OK -> return
+
+            requestCode == REQUEST_PHOTO -> {
+                updatePhotoView()
+                requireActivity().revokeUriPermission(photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            }
 
             requestCode == REQUEST_CONTACT && data != null -> {
                 val contactUri: Uri? = data.data
@@ -143,6 +185,18 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
         }
     }
 
+    private fun existDefaultAppForIntent(packageManager: PackageManager, intent: Intent) =
+        packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null
+
+    private fun updatePhotoView(){
+        if(photoFile.exists()){
+            val bitmap = getScaledBitmap(photoFile.path, requireActivity())
+            crime_photo.setImageBitmap(bitmap)
+        }else{
+            crime_photo.setImageDrawable(null)
+        }
+    }
+
     private fun getCrimeReport(): String {
         val solvedString = if (crime.isSolved) {
             getString(R.string.crime_report_solved)
@@ -161,6 +215,8 @@ class CrimeFragment: Fragment(), DatePickerFragment.Callbacks, TimePickerFragmen
     }
 
     private fun updateUi(){
+        updatePhotoView()
+
         crime_title.setText(crime.title)
         crime_solved.apply {
             isChecked = crime.isSolved

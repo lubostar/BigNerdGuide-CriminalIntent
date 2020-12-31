@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import sk.lubostar.bignerdguide.criminalintent.Crime
 import sk.lubostar.bignerdguide.criminalintent.CrimeRepository
+import java.io.File
 import java.util.*
 
 class CrimeDetailViewModel: ViewModel() {
@@ -21,4 +22,6 @@ class CrimeDetailViewModel: ViewModel() {
     }
 
     fun saveCrime(crime: Crime) = crimeRepository.updateCrime(crime)
+
+    fun getPhotoFile(crime: Crime): File = crimeRepository.getPhotoFile(crime)
 }

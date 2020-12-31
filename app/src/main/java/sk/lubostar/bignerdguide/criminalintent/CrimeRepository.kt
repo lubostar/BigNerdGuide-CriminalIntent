@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import sk.lubostar.bignerdguide.criminalintent.database.CrimeDatabase
 import sk.lubostar.bignerdguide.criminalintent.database.migration_1_2
+import java.io.File
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.Executors
@@ -30,9 +31,11 @@ class CrimeRepository private constructor(context: Context){
 
     private val crimeDao = db.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
+    private val filesDir = context.applicationContext.filesDir
 
     fun getCrimes(): LiveData<List<Crime>> = crimeDao.getCrimes()
     fun getCrime(id: UUID): LiveData<Crime?> = crimeDao.getCrime(id)
     fun updateCrime(crime: Crime) = executor.execute { crimeDao.updateCrime(crime) }
     fun insertCrime(crime: Crime) = executor.execute { crimeDao.insertCrime(crime) }
+    fun getPhotoFile(crime: Crime): File = File(filesDir, crime.photoFileName)
 }
